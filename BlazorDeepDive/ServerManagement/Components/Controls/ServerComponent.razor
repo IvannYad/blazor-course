@@ -1,11 +1,22 @@
-﻿<p>
-    @server.Name is in @server.City and is currently @(server.IsOnline ? "ONLINE" : "OFFLINE")
-</p>
+﻿@if (server is not null)
+{
+    <div>
+        @server.Name is in @server.City and is currently @(server.IsOnline ? "ONLINE" : "OFFLINE")
+        &nbsp;
+        <button type="button" @onclick="ChangeStatus" class="btn btn-primary">Turn On/Off</button>
+    </div>
+}
+
 
 @code {
-    private Server server = new Server()
+    private Server? server { get; set; } =
+        new Server() { Name = "Server 1", City = "Lviv" };
+
+    private void ChangeStatus()
     {
-        Name = "Server 1",
-        City = "Lviv"
-    };
+        if (server is not null)
+        {
+            server.IsOnline = !server.IsOnline;
+        }
+    }
 }
