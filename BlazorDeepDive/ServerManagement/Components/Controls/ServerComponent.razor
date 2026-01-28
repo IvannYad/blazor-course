@@ -1,0 +1,11 @@
+﻿<p>
+    @server.Name is in @server.City and is currently @(server.IsOnline ? "ONLINE" : "OFFLINE")
+</p>
+
+@code {
+    private Server server = new Server()
+    {
+        Name = "Server 1",
+        City = "Lviv"
+    };
+}
