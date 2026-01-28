@@ -49,7 +49,7 @@
         if (serverId > 0)
         {
             ServersRepository.DeleteServer(serverId);
-            nm.Refresh("/servers");
+            nm.Refresh();
         }
     }
 }
