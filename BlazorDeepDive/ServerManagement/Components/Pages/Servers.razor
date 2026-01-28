@@ -1,5 +1,6 @@
 ﻿@page "/servers"
 @inject NavigationManager nm
+@rendermode InteractiveServer
 
 <h3>Servers</h3>
 
@@ -10,10 +11,10 @@
         @foreach (var city in ServersRepository.GetServres().GroupBy(s => s.City).Select(gr => gr.Key))
         {
             <div class="col">
-                <div class="card" style="width: 150px;">
+                <div class="card" style="width: 150px;@(city == selectedCity ? "background-color: blue;" : "")">
                     <img class="card-img-top" src="@($"/images/{city}.png")" alt="Card image cap" >
                     <div class="card-body">
-                        <button class="rounded btn btn-primary">@city</button>
+                        <button class="rounded btn btn-primary" @onclick="() => SelectCity(city)">@city</button>
                     </div>
                 </div>
             </div>
@@ -22,28 +23,35 @@
 </div>
 
 <br />
-<ServerComponent @rendermode="InteractiveServer"></ServerComponent>
+<div class="inout-group mb-3">
+    <input type="text" class="form-control" placeholder="Search Servers" @bind-value="serverFilter" />
+    <button class="btn btn-outline-secondary" type="button" id="button-search" @onclick="HandleSearch">
+        Search
+    </button>
+</div>
+@serverFilter
+<br />
 
 <ul>
-    @foreach(var server in servers)
-    {
-        <li>
+    <Virtualize Items="servers" Context="server">
+        <li @key="server.Id">
             @server.Name is currently <span style="color:@(server.IsOnline ? "green" : "red")">@(server.IsOnline ? "online" : "offline")</span>
             &nbsp;
             <a href="/servers/edit/@server.Id" class="btn btn-link">Edit</a>
             &nbsp;
             <EditForm Model="server" FormName="@($"form-server-{server.Id}")"
-                OnValidSubmit="@(() => DeleteServer(server.Id))"
-            >
+                      OnValidSubmit="@(() => DeleteServer(server.Id))">
                 <button type="submit" class="btn btn-primary">Delete</button>
             </EditForm>
         </li>
-    }
+    </Virtualize>
 </ul>
 
 
 @code {
     private List<Server> servers = ServersRepository.GetServersByCity("Toronto");
+    private string selectedCity = "Toronto";
+    private string serverFilter = "";
 
     private void DeleteServer(int serverId)
     {
@@ -52,5 +60,17 @@
             ServersRepository.DeleteServer(serverId);
             nm.Refresh();
         }
+    }
+
+    private void SelectCity(string cityName)
+    {
+        selectedCity = cityName;
+        servers = ServersRepository.GetServersByCity(selectedCity);
+    }
+
+    private void HandleSearch()
+    {
+        servers = ServersRepository.SearchServers(serverFilter);
+        selectedCity = string.Empty;
     }
 }
