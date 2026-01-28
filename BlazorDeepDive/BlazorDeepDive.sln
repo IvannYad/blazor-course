@@ -5,7 +5,7 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerManagement", "ServerManagement\ServerManagement.csproj", "{352F327D-AF56-45A1-B2E6-63DDF54CC379}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InitialServerInteractivity", "..\InitialServerInteractivity\InitialServerInteractivity.csproj", "{DC045D1D-0B22-4896-A3E2-E70B6043DB11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InitialServerInteractivity", "..\InitialServerInteractivity\InitialServerInteractivity.csproj", "{DC045D1D-0B22-4896-A3E2-E70B6043DB11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
