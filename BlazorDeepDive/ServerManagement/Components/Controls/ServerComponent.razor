@@ -1,22 +1,67 @@
-﻿@if (server is not null)
+﻿@inject NavigationManager nm
+
+@if (Server is not null)
 {
-    <div>
-        @server.Name is in @server.City and is currently @(server.IsOnline ? "ONLINE" : "OFFLINE")
-        &nbsp;
-        <button type="button" @onclick="ChangeStatus" class="btn btn-primary">Turn On/Off</button>
-    </div>
+    <tr style="background-color: @GetBackgroundColor()">
+        <td>
+            @Server.Name
+        </td>
+        <td>@Server.City</td>
+        <td>
+            <span style="color:@(Server.IsOnline ? "green" : "red")">@(Server.IsOnline ? "online" : "offline")</span> @(Server.IsOnline ? $"with {new Random().Next(1, 1000)} peoples" : "")
+        </td>
+        <td>
+            <button type="button"
+                    class="btn @(Server.IsOnline ? "btn-outline-danger" : "btn-outline-success")"
+                    @onclick="() => { Server.IsOnline = !Server.IsOnline; }">
+                @(Server.IsOnline ? "Turn OFF" : "Turn ON")
+            </button>
+        </td>
+        <td>
+            <a href="/servers/edit/@Server.Id" class="btn btn-outline-primary">Edit</a>
+        </td>
+        <td>
+            <EditForm Model="Server" FormName="@($"form-server-{Server.Id}")"
+                      OnValidSubmit="@(() => DeleteServer(Server.Id))">
+                <button type="submit" class="btn btn-primary">Delete</button>
+            </EditForm>
+        </td>
+
+        @* @if (editingServer)
+        {
+            <ServerManagement.Components.Pages.EditServer Id="Server.Id">
+            </ServerManagement.Components.Pages.EditServer>
+        } *@
+    </tr>
 }
 
 
 @code {
-    private Server? server { get; set; } =
-        new Server() { Name = "Server 1", City = "Lviv" };
+    [Parameter]
+    public Server? Server { get; set; }
 
-    private void ChangeStatus()
+    [CascadingParameter(Name = "SelectedCity")]
+    public string? SelectedCity { get; set; }
+
+    private string GetBackgroundColor()
     {
-        if (server is not null)
+        return SelectedCity switch
         {
-            server.IsOnline = !server.IsOnline;
+            "Toronto" => "powderblue",
+            "Montreal" => "lightgray",
+            "Ottawa" => "palegreen",
+            "Calgary" => "pink",
+            "Halifax" => "white",
+            _ => "white"
+        };
+    }
+
+    private void DeleteServer(int serverId)
+    {
+        if (serverId > 0)
+        {
+            ServersRepository.DeleteServer(serverId);
+            nm.Refresh(true);
         }
     }
 }

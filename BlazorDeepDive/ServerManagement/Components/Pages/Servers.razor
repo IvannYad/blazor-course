@@ -6,71 +6,49 @@
 
 <a class="rounded btn btn-primary" href="/servers/add">Add Server</a>
 
-<div class="container-fluid text-center">
-    <div class="row w-50">
-        @foreach (var city in ServersRepository.GetServres().GroupBy(s => s.City).Select(gr => gr.Key))
-        {
-            <div class="col">
-                <div class="card" style="width: 150px;@(city == selectedCity ? "background-color: blue;" : "")">
-                    <img class="card-img-top" src="@($"/images/{city}.png")" alt="Card image cap" >
-                    <div class="card-body">
-                        <button class="rounded btn btn-primary" @onclick="() => SelectCity(city)">@city</button>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-</div>
+<CityListComponent
+    @ref="cityListComponent"
+    @rendermode="InteractiveServer"
+    SelectCityCallback="@HandleSelectCity"
+>
+
+</CityListComponent>
 
 <br />
-<div class="inout-group mb-3">
-    <input type="text" class="form-control" placeholder="Search Servers" @bind-value="serverFilter" />
-    <button class="btn btn-outline-secondary" type="button" id="button-search" @onclick="HandleSearch">
-        Search
-    </button>
-</div>
-@serverFilter
+
+<SearchBarComponent @ref="searchBarComponent" SearchCallback="HandleSearch" />
+
 <br />
 
-<ul>
-    <Virtualize Items="servers" Context="server">
-        <li @key="server.Id">
-            @server.Name is currently <span style="color:@(server.IsOnline ? "green" : "red")">@(server.IsOnline ? "online" : "offline")</span>
-            &nbsp;
-            <a href="/servers/edit/@server.Id" class="btn btn-link">Edit</a>
-            &nbsp;
-            <EditForm Model="server" FormName="@($"form-server-{server.Id}")"
-                      OnValidSubmit="@(() => DeleteServer(server.Id))">
-                <button type="submit" class="btn btn-primary">Delete</button>
-            </EditForm>
-        </li>
-    </Virtualize>
-</ul>
+<CascadingValue Name="SelectedCity" Value="@selectedCity">
+    <ServerListComponent @rendermode="InteractiveServer"
+                         CityName="@selectedCity"
+                         ServerFilter="@serverFilter" />
+</CascadingValue>
+
+
 
 
 @code {
-    private List<Server> servers = ServersRepository.GetServersByCity("Toronto");
-    private string selectedCity = "Toronto";
     private string serverFilter = "";
+    private string selectedCity = "Toronto";
 
-    private void DeleteServer(int serverId)
-    {
-        if (serverId > 0)
-        {
-            ServersRepository.DeleteServer(serverId);
-            nm.Refresh();
-        }
-    }
+    private CityListComponent? cityListComponent;
+    private SearchBarComponent? searchBarComponent;
 
-    private void SelectCity(string cityName)
-    {
-        selectedCity = cityName;
-        servers = ServersRepository.GetServersByCity(selectedCity);
-    }
 
-    private void HandleSearch()
+    private void HandleSearch(string sf)
     {
-        servers = ServersRepository.SearchServers(serverFilter);
+        serverFilter = sf;
         selectedCity = string.Empty;
+        cityListComponent?.ClearSelection();
+    }
+
+    private void HandleSelectCity(string cityName)
+    {
+        // servers = ServersRepository.SearchServers(serverFilter);
+        selectedCity = cityName;
+        serverFilter = string.Empty;
+        searchBarComponent?.ClearSelection();
     }
 }

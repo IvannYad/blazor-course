@@ -1,0 +1,33 @@
+﻿@inject NavigationManager nm
+
+<div class="container-fluid text-center">
+    <div class="row w-50">
+        @foreach (var city in Cities)
+        {
+            <CityComponent City="@city" IsSelected="@(selectedCity == city)"
+                           SelectCityCallback="@HandleCitySelection" />
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<string> SelectCityCallback { get; set; }
+
+    public void ClearSelection()
+    {
+        selectedCity = string.Empty;
+        StateHasChanged();
+    }
+
+    private string selectedCity;
+
+    public IEnumerable<string> Cities { get; set; }
+            = ServersRepository.GetServres().GroupBy(s => s.City).Select(gr => gr.Key);
+
+    private void HandleCitySelection(string cityName)
+    {
+        selectedCity = cityName;
+        SelectCityCallback.InvokeAsync(cityName);
+    }
+}

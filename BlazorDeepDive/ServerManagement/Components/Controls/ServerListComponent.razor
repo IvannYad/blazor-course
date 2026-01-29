@@ -1,0 +1,48 @@
+﻿@if (servers?.Count > 0)
+{
+    <table class="table table-scripted">
+        <RepeaterComponent Items="servers">
+            <Row Context="server">
+                <ServerComponent @key="server.Id" Server="@server" />
+            </Row>
+            <Header>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>City</th>
+                        <th>Status</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </Header>
+        </RepeaterComponent>
+    </table>
+}
+
+
+
+
+
+@code {
+
+    [Parameter]
+    public string? CityName { get; set; }
+
+    [Parameter]
+    public string? ServerFilter { get; set; }
+
+    private List<Server> servers = [];
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrEmpty(ServerFilter))
+        {
+            servers = ServersRepository.SearchServers(ServerFilter);
+            return;
+        }
+
+        servers = ServersRepository.GetServersByCity(CityName ?? "Toronto");
+    }
+}
