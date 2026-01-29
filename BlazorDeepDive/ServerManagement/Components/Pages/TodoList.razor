@@ -5,43 +5,7 @@
 <br />
 
 <button class="btn btn-primary" @onclick="AddToDoItem">Add Task</button>
-<ul class="mt-3 list-unstyled">
-    @if(ToDoItems is not null && ToDoItems.Count > 0)
-    {
-        @foreach (var item in ToDoItems)
-        {
-            <li @key="item.Id">
-                <div class="row mb-2">
-                    <div class="col-1" style="width:30px">
-                        <input
-                            type="checkbox"
-                            class="form-check-input"
-                            style="vertical-align:middle"
-                            @bind-value="item.IsCompleted"
-                            checked="@item.IsCompleted"    
-                        ></input>
-                    </div>
-                    <div class="col">
-                        <input @bind-value="item.Name"
-                            type="text"
-                            class="form-control border-0 @(item.IsCompleted ? "text-decoration-line-through" : "")"
-                            style="vertical-align:middle"
-                            disabled="@item.IsCompleted"
-                        />
-                    </div>
-                    <div class="col">
-                        @if (item.IsCompleted && item.DateCompleted is not null)
-                        {
-                            <text>Completed at: @item.DateCompleted!.Value.ToLongDateString()</text>
-                        }
-                    </div>
-                    
-                </div>
-            </li>
-        }
-    }
-    
-</ul>
+<ToDoItemsListComponent ToDoItems="ToDoItems"></ToDoItemsListComponent>
 
 @code {
     private List<ToDoItem> ToDoItems { get; set; } = ToDoItemsRepository.GetToDoItems();

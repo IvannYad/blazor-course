@@ -1,0 +1,15 @@
+﻿<ul class="mt-3 list-unstyled">
+    @if (ToDoItems is not null && ToDoItems.Count > 0)
+    {
+        @foreach (var item in ToDoItems)
+        {
+            <ToDoItemComponent Item="item"></ToDoItemComponent>
+        }
+    }
+
+</ul>
+
+@code {
+    [Parameter]
+    public List<ToDoItem>? ToDoItems { get; set; }
+}
