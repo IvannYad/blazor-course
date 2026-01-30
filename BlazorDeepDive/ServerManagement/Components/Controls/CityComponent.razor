@@ -1,16 +1,25 @@
-﻿@if (City is not null)
+﻿@inject TorontoOnlineServersStore observable
+@implements IDisposable
+
+@if (City is not null)
 {
     <div class="col">
-        <div class="card" style="width: 150px;@(IsSelected.HasValue && IsSelected.Value ? "background-color: blue;" : "")">
+        <div class="card" style="width: 150px;@(IsSelected.HasValue && IsSelected.Value ? "background-color: lightblue;" : "")">
             <img class="card-img-top" src="@($"/images/{City}.png")" alt="Card image cap">
             <div class="card-body">
                 <button class="rounded btn btn-primary" @onclick="async () => await SelectCityAsync(City)">@City</button>
             </div>
+            @if (City == "Toronto")
+            {
+                <text>Servers online: @count</text>
+            }
         </div>
     </div>
 }
 
 @code {
+    private int count = 0;
+
     [Parameter]
     public string? City { get; set; }
 
@@ -23,5 +32,24 @@
     private async Task SelectCityAsync(string cityName)
     {
         await SelectCityCallback.InvokeAsync(cityName);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        observable.Subscribe(OnTorontoOnlineServersChange);
+        count = observable.OnlineCount;
+    }
+
+    private void OnTorontoOnlineServersChange()
+    {
+        count = observable.OnlineCount;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        observable.Unsubscibe(OnTorontoOnlineServersChange);
     }
 }

@@ -61,8 +61,7 @@
         if (Server is not null)
         {
             ServersRepository.AddServer(Server);
+            NavigationManager.NavigateTo($"/servers/back-from/{Server.City}");
         }
-
-        NavigationManager.NavigateTo("/servers");
     }
 }

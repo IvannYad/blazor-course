@@ -1,4 +1,5 @@
 ﻿@inject NavigationManager nm
+@inject TorontoOnlineServersStore observable
 
 @if (Server is not null)
 {
@@ -13,7 +14,7 @@
         <td>
             <button type="button"
                     class="btn @(Server.IsOnline ? "btn-outline-danger" : "btn-outline-success")"
-                    @onclick="() => { Server.IsOnline = !Server.IsOnline; }">
+                    @onclick="ToggleTurnOnOff">
                 @(Server.IsOnline ? "Turn OFF" : "Turn ON")
             </button>
         </td>
@@ -56,12 +57,20 @@
         };
     }
 
+    private void ToggleTurnOnOff()
+    {
+        Server.IsOnline = !Server.IsOnline;
+        if (Server.City == "Toronto")
+            observable.OnlineCount += Server.IsOnline ? 1 : -1;
+    }
+
     private void DeleteServer(int serverId)
     {
         if (serverId > 0)
         {
             ServersRepository.DeleteServer(serverId);
-            nm.Refresh(true);
+            if (Server is not null)
+                nm.NavigateTo($"/servers/back-from/{Server?.City}", true);
         }
     }
 }

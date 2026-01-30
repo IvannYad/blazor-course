@@ -4,7 +4,7 @@
     <div class="row w-50">
         @foreach (var city in Cities)
         {
-            <CityComponent City="@city" IsSelected="@(selectedCity == city)"
+            <CityComponent City="@city" IsSelected="@(SelectedCity == city)"
                            SelectCityCallback="@HandleCitySelection" />
         }
     </div>
@@ -16,18 +16,19 @@
 
     public void ClearSelection()
     {
-        selectedCity = string.Empty;
+        SelectedCity = string.Empty;
         StateHasChanged();
     }
 
-    private string selectedCity;
+    [Parameter]
+    public string SelectedCity { get; set; } = "Toronto";
 
     public IEnumerable<string> Cities { get; set; }
             = ServersRepository.GetServres().GroupBy(s => s.City).Select(gr => gr.Key);
 
     private void HandleCitySelection(string cityName)
     {
-        selectedCity = cityName;
+        SelectedCity = cityName;
         SelectCityCallback.InvokeAsync(cityName);
     }
 }

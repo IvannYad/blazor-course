@@ -1,15 +1,19 @@
 ﻿@page "/servers"
+@page "/servers/back-from/{CityName}"
+
 @inject NavigationManager nm
 @rendermode InteractiveServer
+@inject TorontoOnlineServersStore observable
 
 <h3>Servers</h3>
 
-<a class="rounded btn btn-primary" href="/servers/add">Add Server</a>
+<a class="rounded btn btn-primary" href="/servername">Add Server</a>
 
 <CityListComponent
     @ref="cityListComponent"
     @rendermode="InteractiveServer"
     SelectCityCallback="@HandleSelectCity"
+    SelectedCity="@selectedCity"
 >
 
 </CityListComponent>
@@ -36,6 +40,24 @@
     private CityListComponent? cityListComponent;
     private SearchBarComponent? searchBarComponent;
 
+    [Parameter]
+    public string? CityName { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (nm.Uri.Contains("back-from") && !string.IsNullOrEmpty(CityName))
+        {
+            selectedCity = CityName!;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        var serversToronto = ServersRepository.GetServersByCity("Toronto");
+        observable.OnlineCount = serversToronto.Where(s => s.IsOnline).Count();
+    }
 
     private void HandleSearch(string sf)
     {
@@ -46,6 +68,9 @@
 
     private void HandleSelectCity(string cityName)
     {
+        if (nm.Uri.Contains("back-from") && !string.IsNullOrEmpty(CityName))
+            nm.NavigateTo("/servers");
+        
         // servers = ServersRepository.SearchServers(serverFilter);
         selectedCity = cityName;
         serverFilter = string.Empty;
